@@ -27,17 +27,16 @@ jobs:
 
       - name: Ustaw Gradle 8.14
         run: |
-          sed -i 's#gradle-[0-9.]*-all.zip#gradle-8.14-all.zip#g' android/gradle/wrapper/gradle-wrapper.properties
-          sed -i 's#gradle-[0-9.]*-bin.zip#gradle-8.14-bin.zip#g' android/gradle/wrapper/gradle-wrapper.properties
-          cat android/gradle/wrapper/gradle-wrapper.properties
+          sed -i 's/gradle-8.10.2-all.zip/gradle-8.14-all.zip/g' android/gradle/wrapper/gradle-wrapper.properties
+          sed -i 's/gradle-8.10.2-bin.zip/gradle-8.14-bin.zip/g' android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Ustaw AGP 8.11.1
         run: |
-          sed -i -E 's/(id "com\.android\.application" version ")[0-9.]+(")/\18.11.1\2/' android/settings.gradle
-          sed -i -E "s/(id 'com\.android\.application' version ')[0-9.]+(')/\18.11.1\2/" android/settings.gradle
-          sed -i -E 's/(com\.android\.tools\.build:gradle:)[0-9.]+/\18.11.1/' android/build.gradle || true
-          echo "=== AGP CHECK ==="
-          grep -R "com.android.application\|com.android.tools.build:gradle" android/settings.gradle android/build.gradle || true
+          sed -i 's/8\.8\.0/8.11.1/g' android/settings.gradle
+          echo "===== SETTINGS.GRADLE ====="
+          cat android/settings.gradle
+          echo "===== SPRAWDZAM AGP ====="
+          grep -n "com.android.application" android/settings.gradle
 
       - name: Zbuduj APK
         run: flutter build apk --release
