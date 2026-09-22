@@ -33,10 +33,13 @@ jobs:
       - name: Ustaw AGP 8.11.1
         run: |
           sed -i 's/8\.8\.0/8.11.1/g' android/settings.gradle
-          echo "===== SETTINGS.GRADLE ====="
-          cat android/settings.gradle
-          echo "===== SPRAWDZAM AGP ====="
-          grep -n "com.android.application" android/settings.gradle
+
+      - name: Ustaw Kotlin 2.2.20
+        run: |
+          sed -i 's/2\.0\.20/2.2.20/g' android/settings.gradle
+          sed -i 's/2\.0\.20/2.2.20/g' android/build.gradle || true
+          echo "===== SPRAWDZAM ====="
+          grep -n "kotlin\|com.android.application" android/settings.gradle || true
 
       - name: Zbuduj APK
         run: flutter build apk --release
