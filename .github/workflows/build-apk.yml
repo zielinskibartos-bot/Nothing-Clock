@@ -1,0 +1,49 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pobierz kod
+        uses: actions/checkout@v4
+
+      - name: Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Pobierz zaleznosci
+        run: flutter pub get
+
+      - name: Ustaw Gradle 8.14
+        run: |
+          sed -i 's#gradle-[0-9.]*-all.zip#gradle-8.14-all.zip#g' android/gradle/wrapper/gradle-wrapper.properties
+          sed -i 's#gradle-[0-9.]*-bin.zip#gradle-8.14-bin.zip#g' android/gradle/wrapper/gradle-wrapper.properties
+          cat android/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Ustaw AGP 8.11.1
+        run: |
+          sed -i -E 's/(id "com\.android\.application" version ")[0-9.]+(")/\18.11.1\2/' android/settings.gradle
+          sed -i -E "s/(id 'com\.android\.application' version ')[0-9.]+(')/\18.11.1\2/" android/settings.gradle
+          sed -i -E 's/(com\.android\.tools\.build:gradle:)[0-9.]+/\18.11.1/' android/build.gradle || true
+          echo "=== AGP CHECK ==="
+          grep -R "com.android.application\|com.android.tools.build:gradle" android/settings.gradle android/build.gradle || true
+
+      - name: Zbuduj APK
+        run: flutter build apk --release
+
+      - name: Zapisz APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nothing-Clock-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
